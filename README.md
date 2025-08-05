@@ -145,8 +145,7 @@ template := template.From(
 )
 
 // Validate a template
-err := template.Validate()
-if err != nil {
+if err := template.Validate(); err != nil {
     log.Fatal(err)
 }
 
@@ -180,13 +179,13 @@ The library provides comprehensive error handling with custom error types for be
 response, err := provider.Invoke(context.Background(), template)
 if err != nil {
     // Check for specific error types
-    if message.IsMessageError(err) {
+    if errorbank.IsMessageError(err) {
         log.Printf("Message error: %v", err)
         // Handle message-specific errors
-    } else if message.IsTemplateError(err) {
+    } else if errorbank.IsTemplateError(err) {
         log.Printf("Template error: %v", err)
         // Handle template errors
-    } else if message.IsValidationError(err) {
+    } else if errorbank.IsValidationError(err) {
         log.Printf("Validation error: %v", err)
         // Handle validation errors
     } else {
@@ -202,7 +201,7 @@ if err != nil {
 ```go
 // Validate messages
 msg := message.FromUser("")
-if err := msg.(interface{ Validate() error }).Validate(); err != nil {
+if err := msg.Validate(); err != nil {
     log.Printf("Message validation failed: %v", err)
 }
 
@@ -219,15 +218,15 @@ All custom errors provide rich context information:
 
 ```go
 // MessageError provides operation and message context
-err := message.NewMessageError("invoke", "failed to process template", originalErr)
+err := errorbank.NewMessageError("invoke", "failed to process template", originalErr)
 // Output: [invoke] failed to process template: <original error>
 
 // TemplateError provides variable and context information
-err := message.NewTemplateError("name", "variable not found", nil)
+err := errorbank.NewTemplateError("name", "variable not found", nil)
 // Output: [Template] variable 'name': variable not found
 
 // ValidationError provides field and value information
-err := message.NewValidationError("content", "cannot be empty", "")
+err := errorbank.NewValidationError("content", "cannot be empty", "")
 // Output: [Validation] field 'content': cannot be empty (value: )
 ```
 
@@ -239,7 +238,7 @@ err := message.NewValidationError("content", "cannot be empty", "")
 2. **Message System** (`message/`): Conversation message handling and templates
 3. **Template System** (`template/`): Variable substitution and conversation templates
 4. **HTTP Client** (`pkg/httpx/`): HTTP request handling and utilities
-5. **Error Handling** (`message/errors.go`): Custom error types and utilities
+5. **Error Handling** (`pkg/errorbank/`): Custom error types and utilities
 
 ### Design Patterns
 
@@ -249,25 +248,6 @@ err := message.NewValidationError("content", "cannot be empty", "")
 - **Template Method**: Reusable conversation patterns
 - **Error Wrapping**: Comprehensive error context and type checking
 
-## Testing
-
-Run the test suite:
-
-```bash
-go test ./...
-```
-
-Run tests with coverage:
-
-```bash
-go test -cover ./...
-```
-
-Run specific error handling tests:
-
-```bash
-go test ./message -v
-```
 
 ## Contributing
 
@@ -290,10 +270,7 @@ For questions, issues, or contributions, please open an issue on GitHub.
 
 - [ ] Add more LLM providers
 - [ ] Implement streaming responses
-- [ ] Add rate limiting
-- [ ] Add retry mechanisms
 - [ ] Add caching capabilities
 - [ ] Add monitoring and metrics
-- [ ] Add CLI tool
 - [ ] Add configuration management
 - [ ] Add plugin system 
