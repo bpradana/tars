@@ -1,0 +1,36 @@
+package llm
+
+type Message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+	Refusal string `json:"refusal"`
+}
+
+type Choice struct {
+	Message      Message        `json:"message"`
+	LogProbs     map[string]any `json:"logprobs"`
+	FinishReason string         `json:"finish_reason"`
+	Index        int            `json:"index"`
+}
+
+type Usage struct {
+	PromptTokens     int `json:"prompt_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	TotalTokens      int `json:"total_tokens"`
+}
+
+type ChatCompletionsRequest struct {
+	Model    string    `json:"model"`
+	Messages []Message `json:"messages"`
+}
+
+type ChatCompletionsResponse struct {
+	ID                string   `json:"id"`
+	Choices           []Choice `json:"choices"`
+	Provider          string   `json:"provider"`
+	Model             string   `json:"model"`
+	Object            string   `json:"object"`
+	Created           int      `json:"created"`
+	SystemFingerprint string   `json:"system_fingerprint"`
+	Usage             Usage    `json:"usage"`
+}
