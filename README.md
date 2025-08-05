@@ -1,6 +1,6 @@
-# Tars - Unified LLM Interface
+# TARS - Unified LLM Interface
 
-Tars is a Go library that provides a unified interface for interacting with various Large Language Model (LLM) providers. It abstracts away the differences between providers like OpenAI, Anthropic, OpenRouter, and Ollama, allowing you to switch between them seamlessly.
+TARS is a Go library that provides a unified interface for interacting with various Large Language Model (LLM) providers. It abstracts away the differences between providers like OpenAI, Anthropic, OpenRouter, and Ollama, allowing you to switch between them seamlessly.
 
 ## Features
 
