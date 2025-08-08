@@ -6,6 +6,7 @@ TARS is a Go library that provides a unified interface for interacting with vari
 
 - **Unified Interface**: Single API for multiple LLM providers
 - **Template System**: Reusable conversation templates with variable substitution
+- **Structured Output**: JSON schema support for consistent, typed responses
 - **Type Safety**: Strong typing throughout the codebase
 - **Error Handling**: Comprehensive error types and handling
 - **Validation**: Built-in validation for messages and templates
@@ -170,6 +171,97 @@ response, err := provider.Invoke(context.Background(), template,
     llm.WithTemperature(0.7),
     llm.WithMaxTokens(1000),
 )
+```
+
+### Structured Output
+
+TARS supports structured output using JSON schemas, allowing you to get consistent, typed responses from LLM providers. This is useful for applications that need to process LLM responses programmatically.
+
+#### Basic Structured Output
+
+```go
+// Define a struct for structured output
+type WeatherInfo struct {
+    Temperature float64 `json:"temperature"`
+    Condition   string  `json:"condition"`
+    Humidity    int     `json:"humidity"`
+    WindSpeed   float64 `json:"wind_speed"`
+    Description string  `json:"description"`
+}
+
+// Create a template
+template := template.From(
+    message.FromSystem("You are a weather assistant. Provide weather information in the requested format."),
+    message.FromUser("What's the weather like in Paris today?"),
+)
+
+// Use structured output
+var weatherInfo WeatherInfo
+response, err := provider.Invoke(context.Background(), template,
+    llm.WithStructuredOutput(&weatherInfo),
+    llm.WithTemperature(0.3), // Lower temperature for more consistent structured output
+)
+if err != nil {
+    log.Fatal(err)
+}
+
+// The response content will be JSON that matches the WeatherInfo struct
+fmt.Printf("Temperature: %.1f°C\n", weatherInfo.Temperature)
+fmt.Printf("Condition: %s\n", weatherInfo.Condition)
+```
+
+#### Complex Structured Output
+
+```go
+// Define a complex struct with arrays and nested objects
+type AnalysisResult struct {
+    Sentiment      string   `json:"sentiment"`
+    Confidence     float64  `json:"confidence"`
+    KeyPoints      []string `json:"key_points"`
+    Summary        string   `json:"summary"`
+    Recommendations []string `json:"recommendations"`
+}
+
+template := template.From(
+    message.FromSystem("You are a text analysis assistant. Analyze the given text and provide structured insights."),
+    message.FromUser("Analyze this text: 'The new smartphone features an amazing camera and great battery life.'"),
+)
+
+var analysis AnalysisResult
+response, err := provider.Invoke(context.Background(), template,
+    llm.WithStructuredOutput(&analysis),
+    llm.WithTemperature(0.2),
+)
+
+fmt.Printf("Sentiment: %s (Confidence: %.2f)\n", analysis.Sentiment, analysis.Confidence)
+fmt.Printf("Key Points: %v\n", analysis.KeyPoints)
+```
+
+#### Best Practices for Structured Output
+
+1. **Use Lower Temperature**: Set temperature to 0.2-0.3 for more consistent structured output
+2. **Clear Instructions**: Provide explicit instructions about the expected format
+3. **Validation**: Always validate the structured output before using it
+4. **Error Handling**: Handle cases where the LLM doesn't return valid JSON
+5. **Schema Design**: Design your structs to be clear and unambiguous
+
+```go
+// Example with error handling
+var result MyStruct
+response, err := provider.Invoke(ctx, template,
+    llm.WithStructuredOutput(&result),
+    llm.WithTemperature(0.2),
+)
+if err != nil {
+    log.Printf("Error getting structured output: %v", err)
+    return
+}
+
+// Validate the structured output
+if result.RequiredField == "" {
+    log.Printf("Invalid structured output: missing required field")
+    return
+}
 ```
 
 ## Error Handling

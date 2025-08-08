@@ -15,6 +15,8 @@ examples/
 │   └── advanced_templates.go
 ├── error-handling/                 # Error handling examples
 │   └── error_handling.go
+├── structured-output/              # Structured output examples
+│   └── structured_output_example.go # JSON schema and structured data examples
 └── real-world/                     # Real-world application examples
     ├── chat-bot
     │   └── chat_bot.go             # Interactive chat bot
@@ -67,6 +69,12 @@ go run templates/advanced_templates.go
 go run error-handling/error_handling.go
 ```
 
+#### Structured Output Examples
+```bash
+# JSON schema and structured data examples
+go run structured-output/structured_output_example.go
+```
+
 ## Example Categories
 
 ### Basic Examples (`basic/`)
@@ -95,6 +103,15 @@ go run error-handling/error_handling.go
 - Provider errors
 - Error type checking
 - Robust error handling patterns
+
+### Structured Output Examples (`structured-output/`)
+- JSON schema generation from Go structs
+- Structured data extraction
+- Weather information parsing
+- Person profile generation
+- Product catalog data
+- Text analysis with structured results
+- Error handling for structured output
 
 ### Real-World Examples (`real-world/`)
 - Interactive chat bot with conversation history
@@ -181,6 +198,30 @@ if err != nil {
     }
     return
 }
+```
+
+### Structured Output
+```go
+// Define a struct for structured output
+type WeatherInfo struct {
+    Temperature float64 `json:"temperature"`
+    Condition   string  `json:"condition"`
+    Humidity    int     `json:"humidity"`
+}
+
+// Use structured output
+var weatherInfo WeatherInfo
+response, err := provider.Invoke(ctx, template,
+    llm.WithStructuredOutput(&weatherInfo),
+    llm.WithTemperature(0.3), // Lower temperature for consistency
+)
+if err != nil {
+    log.Printf("Error: %v", err)
+    return
+}
+
+// Access structured data
+fmt.Printf("Temperature: %.1f°C\n", weatherInfo.Temperature)
 ```
 
 ## Contributing

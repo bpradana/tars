@@ -1,6 +1,12 @@
 package llm
 
-import "time"
+import (
+	"encoding/json"
+	"strings"
+	"time"
+
+	"github.com/invopop/jsonschema"
+)
 
 // llmOptions contains configuration options for LLM providers.
 // This struct is used internally to collect options during provider initialization.
@@ -95,6 +101,7 @@ type invokeOptions struct {
 	temperature      float64
 	maxTokens        int
 	structuredOutput any
+	jsonSchema       map[string]any
 }
 
 // InvokeOption is a function type that modifies invoke options.
@@ -155,8 +162,17 @@ func WithMaxTokens(maxTokens int) InvokeOption {
 //	response, err := provider.Invoke(ctx, template,
 //	  WithStructuredOutput(&StructuredOutput{}),
 //	)
-func WithStructuredOutput(structuredOutput *any) InvokeOption {
+func WithStructuredOutput(structuredOutput any) InvokeOption {
 	return func(llm *invokeOptions) {
 		llm.structuredOutput = structuredOutput
+
+		llm.jsonSchema = func() map[string]any {
+			schema := jsonschema.Reflect(structuredOutput)
+			ref := strings.Split(schema.Ref, "#/$defs/")
+			schemaDefinition, _ := schema.Definitions[ref[1]].MarshalJSON()
+			var jsonSchema map[string]any
+			_ = json.Unmarshal(schemaDefinition, &jsonSchema)
+			return jsonSchema
+		}()
 	}
 }

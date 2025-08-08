@@ -2,6 +2,7 @@ package llm
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/bpradana/failsafe"
@@ -58,7 +59,7 @@ func (o *OpenRouterProvider) Invoke(ctx context.Context, template template.Templ
 	}
 
 	opts := invokeOptions{
-		model:       "google/gemini-2.0-flash-001",
+		model:       "gpt-4o-mini",
 		temperature: 0.7,
 		maxTokens:   1000,
 	}
@@ -85,6 +86,19 @@ func (o *OpenRouterProvider) Invoke(ctx context.Context, template template.Templ
 				}
 				return msgs
 			}(),
+			ResponseFormat: func() *ResponseFormat {
+				if opts.jsonSchema != nil {
+					return &ResponseFormat{
+						Type: "json_schema",
+						JsonSchema: JsonSchema{
+							Name:   "schema",
+							Strict: true,
+							Schema: opts.jsonSchema,
+						},
+					}
+				}
+				return nil
+			}(),
 		})
 	})
 	if err != nil {
@@ -99,6 +113,13 @@ func (o *OpenRouterProvider) Invoke(ctx context.Context, template template.Templ
 
 	if len(result.Choices) == 0 {
 		return nil, errorbank.NewMessageError("no_choices", "no choices in response", nil)
+	}
+
+	if opts.jsonSchema != nil {
+		err = json.Unmarshal([]byte(result.Choices[0].Message.Content), opts.structuredOutput)
+		if err != nil {
+			return nil, errorbank.NewMessageError("json_unmarshal", "failed to unmarshal structured output", err)
+		}
 	}
 
 	return message.FromAssistant(

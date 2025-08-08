@@ -2,6 +2,7 @@ package llm
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/bpradana/failsafe"
@@ -79,6 +80,19 @@ func (o *OllamaProvider) Invoke(ctx context.Context, template template.Template,
 				}
 				return msgs
 			}(),
+			ResponseFormat: func() *ResponseFormat {
+				if opts.jsonSchema != nil {
+					return &ResponseFormat{
+						Type: "json_schema",
+						JsonSchema: JsonSchema{
+							Name:   "schema",
+							Strict: true,
+							Schema: opts.jsonSchema,
+						},
+					}
+				}
+				return nil
+			}(),
 		})
 	})
 	if err != nil {
@@ -93,6 +107,13 @@ func (o *OllamaProvider) Invoke(ctx context.Context, template template.Template,
 
 	if len(result.Choices) == 0 {
 		return nil, errorbank.NewMessageError("no_choices", "no choices in response", nil)
+	}
+
+	if opts.jsonSchema != nil {
+		err = json.Unmarshal([]byte(result.Choices[0].Message.Content), opts.structuredOutput)
+		if err != nil {
+			return nil, errorbank.NewMessageError("json_unmarshal", "failed to unmarshal structured output", err)
+		}
 	}
 
 	return message.FromAssistant(

@@ -19,10 +19,21 @@ type Usage struct {
 	TotalTokens      int `json:"total_tokens"`
 }
 
+type JsonSchema struct {
+	Name   string         `json:"name"`
+	Strict bool           `json:"strict"`
+	Schema map[string]any `json:"schema"`
+}
+
+type ResponseFormat struct {
+	Type       string     `json:"type"`
+	JsonSchema JsonSchema `json:"json_schema"`
+}
+
 type ChatCompletionsRequest struct {
-	Model          string    `json:"model"`
-	Messages       []Message `json:"messages"`
-	ResponseFormat any       `json:"response_format"`
+	Model          string          `json:"model"`
+	Messages       []Message       `json:"messages"`
+	ResponseFormat *ResponseFormat `json:"response_format,omitempty"`
 }
 
 type ChatCompletionsResponse struct {
