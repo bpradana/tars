@@ -91,9 +91,10 @@ func WithMaxDelay(maxDelay time.Duration) LLMOption {
 // invokeOptions contains configuration options for individual LLM requests.
 // These options can be customized per request to control the model's behavior.
 type invokeOptions struct {
-	model       string
-	temperature float64
-	maxTokens   int
+	model            string
+	temperature      float64
+	maxTokens        int
+	structuredOutput any
 }
 
 // InvokeOption is a function type that modifies invoke options.
@@ -142,5 +143,20 @@ func WithTemperature(temperature float64) InvokeOption {
 func WithMaxTokens(maxTokens int) InvokeOption {
 	return func(llm *invokeOptions) {
 		llm.maxTokens = maxTokens
+	}
+}
+
+// WithStructuredOutput sets the structured output for the request.
+// The structured output is a pointer to a struct that will be used to unmarshal the response.
+// This is useful for returning structured data from the model.
+//
+// Example:
+//
+//	response, err := provider.Invoke(ctx, template,
+//	  WithStructuredOutput(&StructuredOutput{}),
+//	)
+func WithStructuredOutput(structuredOutput *any) InvokeOption {
+	return func(llm *invokeOptions) {
+		llm.structuredOutput = structuredOutput
 	}
 }

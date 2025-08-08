@@ -1,9 +1,9 @@
 package message
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
-	"strings"
+	"text/template"
 
 	"github.com/bpradana/tars/pkg/errorbank"
 )
@@ -14,7 +14,7 @@ type Message interface {
 	GetRole() RoleType
 	GetContent() string
 	GetUsage() usage
-	Invoke(v map[string]any) Message
+	Invoke(v any) Message
 	ToJSON() string
 	Validate() error
 }
@@ -47,20 +47,24 @@ func (m message) GetUsage() usage {
 
 // Invoke performs template variable substitution on the message content.
 // It creates a new message with substituted content without modifying the original.
-func (m message) Invoke(v map[string]any) Message {
-	if len(v) == 0 {
+func (m message) Invoke(v any) Message {
+	if v == nil {
 		return m
 	}
 
-	content := m.Content
-	for k, val := range v {
-		placeholder := fmt.Sprintf("{{%s}}", k)
-		content = strings.ReplaceAll(content, placeholder, fmt.Sprintf("%v", val))
+	tmpl, err := template.New("message").Parse(m.Content)
+	if err != nil {
+		return m
+	}
+
+	var content bytes.Buffer
+	if err := tmpl.Execute(&content, v); err != nil {
+		return m
 	}
 
 	return message{
 		Role:    m.Role,
-		Content: content,
+		Content: content.String(),
 		Usage:   m.Usage,
 	}
 }

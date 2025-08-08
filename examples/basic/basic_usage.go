@@ -96,13 +96,16 @@ func templateSystemExample() {
 	// Create a template with variables
 	template := template.From(
 		message.FromSystem("You are a helpful assistant."),
-		message.FromUser("Hello, {{name}}! How is the weather in {{city}} today?"),
+		message.FromUser("Hello, {{.Name}}! How is the weather in {{.City}} today?"),
 	)
 
 	// Substitute variables
-	invokedTemplate := template.Invoke(map[string]any{
-		"name": "Alice",
-		"city": "Paris",
+	invokedTemplate := template.Invoke(struct {
+		Name string
+		City string
+	}{
+		Name: "Alice",
+		City: "Paris",
 	})
 
 	ctx := context.Background()

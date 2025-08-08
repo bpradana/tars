@@ -61,7 +61,7 @@ func (r *Request) WithBody(body io.Reader) *Request {
 }
 
 // WithJSON sets the request body to JSON and sets Content-Type header
-func (r *Request) WithJSON(data interface{}) *Request {
+func (r *Request) WithJSON(data any) *Request {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		// In a real implementation, you might want to handle this error differently

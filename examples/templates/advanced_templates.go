@@ -37,16 +37,20 @@ func complexTemplateExample() {
 	// Create a complex template with multiple variables
 	template := template.From(
 		message.FromSystem("You are a travel assistant. Provide helpful information about destinations."),
-		message.FromUser("I'm planning a trip to {{destination}} for {{duration}} days. I'm interested in {{interests}}. Can you suggest an itinerary?"),
-		message.FromAssistant("I'd be happy to help you plan your trip to {{destination}}! Let me create a {{duration}}-day itinerary focused on {{interests}}."),
-		message.FromUser("What's the best time to visit {{destination}}?"),
+		message.FromUser("I'm planning a trip to {{.Destination}} for {{.Duration}} days. I'm interested in {{.Interests}}. Can you suggest an itinerary?"),
+		message.FromAssistant("I'd be happy to help you plan your trip to {{.Destination}}! Let me create a {{.Duration}}-day itinerary focused on {{.Interests}}."),
+		message.FromUser("What's the best time to visit {{.Destination}}?"),
 	)
 
 	// Substitute multiple variables
-	invokedTemplate := template.Invoke(map[string]any{
-		"destination": "Japan",
-		"duration":    "7",
-		"interests":   "culture, food, and technology",
+	invokedTemplate := template.Invoke(struct {
+		Destination string
+		Duration    string
+		Interests   string
+	}{
+		Destination: "Japan",
+		Duration:    "7",
+		Interests:   "culture, food, and technology",
 	})
 
 	// Validate the template
@@ -116,11 +120,11 @@ func templateCompositionExample() {
 	)
 
 	greetingTemplate := template.From(
-		message.FromUser("Hello, {{name}}! How are you today?"),
+		message.FromUser("Hello, {{.Name}}! How are you today?"),
 	)
 
 	questionTemplate := template.From(
-		message.FromUser("What's the weather like in {{city}}?"),
+		message.FromUser("What's the weather like in {{.City}}?"),
 	)
 
 	// Compose templates by combining them
@@ -131,9 +135,12 @@ func templateCompositionExample() {
 	)
 
 	// Substitute variables
-	invokedTemplate := composedTemplate.Invoke(map[string]any{
-		"name": "Alice",
-		"city": "Paris",
+	invokedTemplate := composedTemplate.Invoke(struct {
+		Name string
+		City string
+	}{
+		Name: "Alice",
+		City: "Paris",
 	})
 
 	// Validate and use
@@ -161,12 +168,14 @@ func jsonSerializationExample() {
 	// Create a template
 	template := template.From(
 		message.FromSystem("You are a helpful assistant."),
-		message.FromUser("Hello, {{name}}!"),
+		message.FromUser("Hello, {{.Name}}!"),
 	)
 
 	// Substitute variables
-	invokedTemplate := template.Invoke(map[string]any{
-		"name": "Bob",
+	invokedTemplate := template.Invoke(struct {
+		Name string
+	}{
+		Name: "Bob",
 	})
 
 	// Serialize to JSON

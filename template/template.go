@@ -24,8 +24,8 @@ type Template interface {
 	// Invoke performs variable substitution on all messages in the template.
 	// It creates a new template with substituted content without modifying the original.
 	// The variables map should contain key-value pairs where keys correspond
-	// to placeholder names in the template (e.g., "{{name}}").
-	Invoke(v map[string]any) Template
+	// to placeholder names in the template (e.g., "{{.Name}}").
+	Invoke(v any) Template
 
 	// ToJSON serializes the template to JSON string format.
 	// Returns an empty string if serialization fails.
@@ -43,7 +43,7 @@ type Template interface {
 //
 //	template := From(
 //	  message.FromSystem("You are a helpful assistant."),
-//	  message.FromUser("Hello, {{name}}!"),
+//	  message.FromUser("Hello, {{.Name}}!"),
 //	)
 func From(messages ...message.Message) Template {
 	return template{
@@ -62,12 +62,15 @@ func (t template) GetMessage() []message.Message {
 //
 // Example:
 //
-//	result := template.Invoke(map[string]any{
-//	  "name": "Alice",
-//	  "city": "Paris",
+//	result := template.Invoke(struct {
+//	  Name string
+//	  City string
+//	}{
+//	  Name: "Alice",
+//	  City: "Paris",
 //	})
-func (t template) Invoke(v map[string]any) Template {
-	if len(v) == 0 {
+func (t template) Invoke(v any) Template {
+	if v == nil {
 		return t
 	}
 

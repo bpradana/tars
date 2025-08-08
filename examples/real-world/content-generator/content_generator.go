@@ -28,13 +28,17 @@ func NewContentGenerator(provider llm.BaseProvider) *ContentGenerator {
 func (cg *ContentGenerator) GenerateBlogPost(ctx context.Context, topic, style, tone string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a professional content writer. Write engaging, well-structured blog posts."),
-		message.FromUser("Write a {{style}} blog post about {{topic}} in a {{tone}} tone. Include an introduction, main points, and conclusion."),
+		message.FromUser("Write a {{.Style}} blog post about {{.Topic}} in a {{.Tone}} tone. Include an introduction, main points, and conclusion."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"topic": topic,
-		"style": style,
-		"tone":  tone,
+	invokedTemplate := template.Invoke(struct {
+		Topic string
+		Style string
+		Tone  string
+	}{
+		Topic: topic,
+		Style: style,
+		Tone:  tone,
 	})
 
 	response, err := cg.provider.Invoke(ctx, invokedTemplate)
@@ -49,13 +53,17 @@ func (cg *ContentGenerator) GenerateBlogPost(ctx context.Context, topic, style, 
 func (cg *ContentGenerator) GenerateEmail(ctx context.Context, recipient, purpose, context string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a professional email writer. Write clear, concise, and professional emails."),
-		message.FromUser("Write a professional email to {{recipient}} for the purpose of {{purpose}}. Context: {{context}}. Include a proper greeting and closing."),
+		message.FromUser("Write a professional email to {{.Recipient}} for the purpose of {{.Purpose}}. Context: {{.Context}}. Include a proper greeting and closing."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"recipient": recipient,
-		"purpose":   purpose,
-		"context":   context,
+	invokedTemplate := template.Invoke(struct {
+		Recipient string
+		Purpose   string
+		Context   string
+	}{
+		Recipient: recipient,
+		Purpose:   purpose,
+		Context:   context,
 	})
 
 	response, err := cg.provider.Invoke(ctx, invokedTemplate)
@@ -70,13 +78,17 @@ func (cg *ContentGenerator) GenerateEmail(ctx context.Context, recipient, purpos
 func (cg *ContentGenerator) GenerateSocialMediaPost(ctx context.Context, platform, topic, hashtags string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a social media expert. Create engaging posts optimized for different platforms."),
-		message.FromUser("Create a {{platform}} post about {{topic}}. Include relevant hashtags: {{hashtags}}. Keep it engaging and platform-appropriate."),
+		message.FromUser("Create a {{.Platform}} post about {{.Topic}}. Include relevant hashtags: {{.Hashtags}}. Keep it engaging and platform-appropriate."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"platform": platform,
-		"topic":    topic,
-		"hashtags": hashtags,
+	invokedTemplate := template.Invoke(struct {
+		Platform string
+		Topic    string
+		Hashtags string
+	}{
+		Platform: platform,
+		Topic:    topic,
+		Hashtags: hashtags,
 	})
 
 	response, err := cg.provider.Invoke(ctx, invokedTemplate)
@@ -91,13 +103,17 @@ func (cg *ContentGenerator) GenerateSocialMediaPost(ctx context.Context, platfor
 func (cg *ContentGenerator) GenerateProductDescription(ctx context.Context, product, features, targetAudience string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a marketing copywriter. Write compelling product descriptions that convert."),
-		message.FromUser("Write a compelling product description for {{product}}. Key features: {{features}}. Target audience: {{targetAudience}}. Focus on benefits and value proposition."),
+		message.FromUser("Write a compelling product description for {{.Product}}. Key features: {{.Features}}. Target audience: {{.TargetAudience}}. Focus on benefits and value proposition."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"product":        product,
-		"features":       features,
-		"targetAudience": targetAudience,
+	invokedTemplate := template.Invoke(struct {
+		Product        string
+		Features       string
+		TargetAudience string
+	}{
+		Product:        product,
+		Features:       features,
+		TargetAudience: targetAudience,
 	})
 
 	response, err := cg.provider.Invoke(ctx, invokedTemplate)

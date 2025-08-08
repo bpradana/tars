@@ -20,8 +20,9 @@ type Usage struct {
 }
 
 type ChatCompletionsRequest struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+	Model          string    `json:"model"`
+	Messages       []Message `json:"messages"`
+	ResponseFormat any       `json:"response_format"`
 }
 
 type ChatCompletionsResponse struct {

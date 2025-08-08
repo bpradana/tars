@@ -155,12 +155,14 @@ provider, err := llm.NewProvider(llm.ProviderOpenAI,
 // Simple template
 template := template.From(
     message.FromSystem("You are a helpful assistant."),
-    message.FromUser("Hello, {{name}}!"),
+    message.FromUser("Hello, {{.Name}}!"),
 )
 
 // With variable substitution
-invokedTemplate := template.Invoke(map[string]any{
-    "name": "Alice",
+invokedTemplate := template.Invoke(struct {
+    Name string
+} {
+    Name: "Alice",
 })
 ```
 

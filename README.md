@@ -51,7 +51,7 @@ func main() {
     // Create a conversation template
     template := template.From(
         message.FromSystem("You are a helpful assistant."),
-        message.FromUser("What is the capital of {{country}}?"),
+        message.FromUser("What is the capital of {{.Country}}?"),
     )
 
     // Validate the template before using it
@@ -60,8 +60,10 @@ func main() {
     }
 
     // Substitute variables and send to LLM
-    prompt := template.Invoke(map[string]any{
-        "country": "France",
+    prompt := template.Invoke(struct {
+        Country string
+    } {
+        Country: "France",
     })
 
     response, err := provider.Invoke(context.Background(), prompt)
@@ -141,7 +143,7 @@ if err := assistantMsg.Validate(); err != nil {
 // Create a template
 template := template.From(
     message.FromSystem("You are a helpful assistant."),
-    message.FromUser("Hello, {{name}}! How are you today?"),
+    message.FromUser("Hello, {{.Name}}! How are you today?"),
 )
 
 // Validate a template
@@ -150,8 +152,10 @@ if err := template.Validate(); err != nil {
 }
 
 // Substitute variables
-prompt := template.Invoke(map[string]any{
-    "name": "Alice",
+prompt := template.Invoke(struct {
+    Name string
+} {
+    Name: "Alice",
 })
 
 // Send to LLM

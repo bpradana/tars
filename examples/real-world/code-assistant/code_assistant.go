@@ -28,13 +28,17 @@ func NewCodeAssistant(provider llm.BaseProvider) *CodeAssistant {
 func (ca *CodeAssistant) GenerateCode(ctx context.Context, language, description, requirements string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are an expert programmer. Write clean, well-documented, and efficient code."),
-		message.FromUser("Write {{language}} code for: {{description}}. Requirements: {{requirements}}. Include comments and follow best practices."),
+		message.FromUser("Write {{.Language}} code for: {{.Description}}. Requirements: {{.Requirements}}. Include comments and follow best practices."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"language":     language,
-		"description":  description,
-		"requirements": requirements,
+	invokedTemplate := template.Invoke(struct {
+		Language     string
+		Description  string
+		Requirements string
+	}{
+		Language:     language,
+		Description:  description,
+		Requirements: requirements,
 	})
 
 	response, err := ca.provider.Invoke(ctx, invokedTemplate)
@@ -49,13 +53,17 @@ func (ca *CodeAssistant) GenerateCode(ctx context.Context, language, description
 func (ca *CodeAssistant) DebugCode(ctx context.Context, language, code, errorMessage string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a debugging expert. Analyze code and provide fixes for issues."),
-		message.FromUser("Debug this {{language}} code:\n\n{{code}}\n\nError: {{errorMessage}}\n\nProvide the corrected code and explanation."),
+		message.FromUser("Debug this {{.Language}} code:\n\n{{.Code}}\n\nError: {{.ErrorMessage}}\n\nProvide the corrected code and explanation."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"language":     language,
-		"code":         code,
-		"errorMessage": errorMessage,
+	invokedTemplate := template.Invoke(struct {
+		Language     string
+		Code         string
+		ErrorMessage string
+	}{
+		Language:     language,
+		Code:         code,
+		ErrorMessage: errorMessage,
 	})
 
 	response, err := ca.provider.Invoke(ctx, invokedTemplate)
@@ -70,12 +78,15 @@ func (ca *CodeAssistant) DebugCode(ctx context.Context, language, code, errorMes
 func (ca *CodeAssistant) ReviewCode(ctx context.Context, language, code string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a senior code reviewer. Analyze code for best practices, performance, and maintainability."),
-		message.FromUser("Review this {{language}} code:\n\n{{code}}\n\nProvide feedback on code quality, potential issues, and improvement suggestions."),
+		message.FromUser("Review this {{.Language}} code:\n\n{{.Code}}\n\nProvide feedback on code quality, potential issues, and improvement suggestions."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"language": language,
-		"code":     code,
+	invokedTemplate := template.Invoke(struct {
+		Language string
+		Code     string
+	}{
+		Language: language,
+		Code:     code,
 	})
 
 	response, err := ca.provider.Invoke(ctx, invokedTemplate)
@@ -90,12 +101,15 @@ func (ca *CodeAssistant) ReviewCode(ctx context.Context, language, code string) 
 func (ca *CodeAssistant) ExplainCode(ctx context.Context, language, code string) (string, error) {
 	template := template.From(
 		message.FromSystem("You are a programming instructor. Explain code in a clear and educational manner."),
-		message.FromUser("Explain this {{language}} code step by step:\n\n{{code}}\n\nProvide a detailed explanation suitable for learning."),
+		message.FromUser("Explain this {{.Language}} code step by step:\n\n{{.Code}}\n\nProvide a detailed explanation suitable for learning."),
 	)
 
-	invokedTemplate := template.Invoke(map[string]any{
-		"language": language,
-		"code":     code,
+	invokedTemplate := template.Invoke(struct {
+		Language string
+		Code     string
+	}{
+		Language: language,
+		Code:     code,
 	})
 
 	response, err := ca.provider.Invoke(ctx, invokedTemplate)

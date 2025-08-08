@@ -116,7 +116,7 @@ func (c *Client) Get(url string) (*Response, error) {
 }
 
 // Post performs a POST request with JSON body and returns the response
-func (c *Client) Post(url string, data interface{}) (*Response, error) {
+func (c *Client) Post(url string, data any) (*Response, error) {
 	req, err := c.POST(url)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func (c *Client) PostForm(url string, data map[string]string) (*Response, error)
 }
 
 // Put performs a PUT request with JSON body and returns the response
-func (c *Client) Put(url string, data interface{}) (*Response, error) {
+func (c *Client) Put(url string, data any) (*Response, error) {
 	req, err := c.PUT(url)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ func (c *Client) Delete(url string) (*Response, error) {
 }
 
 // Patch performs a PATCH request with JSON body and returns the response
-func (c *Client) Patch(url string, data interface{}) (*Response, error) {
+func (c *Client) Patch(url string, data any) (*Response, error) {
 	req, err := c.PATCH(url)
 	if err != nil {
 		return nil, err
@@ -196,7 +196,7 @@ func Get(url string) (*Response, error) {
 }
 
 // Post performs a POST request with JSON body using the default client and returns the response
-func Post(url string, data interface{}) (*Response, error) {
+func Post(url string, data any) (*Response, error) {
 	return defaultClient.Post(url, data)
 }
 
@@ -206,7 +206,7 @@ func PostForm(url string, data map[string]string) (*Response, error) {
 }
 
 // Put performs a PUT request with JSON body using the default client and returns the response
-func Put(url string, data interface{}) (*Response, error) {
+func Put(url string, data any) (*Response, error) {
 	return defaultClient.Put(url, data)
 }
 
@@ -216,6 +216,6 @@ func Delete(url string) (*Response, error) {
 }
 
 // Patch performs a PATCH request with JSON body using the default client and returns the response
-func Patch(url string, data interface{}) (*Response, error) {
+func Patch(url string, data any) (*Response, error) {
 	return defaultClient.Patch(url, data)
 }

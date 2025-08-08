@@ -62,7 +62,7 @@ func (r *Response) Bytes() []byte {
 }
 
 // Decode decodes the response body into the given interface
-func (r *Response) Decode(v interface{}) error {
+func (r *Response) Decode(v any) error {
 	if len(r.body) == 0 {
 		return fmt.Errorf("response body is empty")
 	}
@@ -71,7 +71,7 @@ func (r *Response) Decode(v interface{}) error {
 }
 
 // DecodeJSON is an alias for Decode for better readability
-func (r *Response) DecodeJSON(v interface{}) error {
+func (r *Response) DecodeJSON(v any) error {
 	return r.Decode(v)
 }
 
@@ -109,7 +109,7 @@ func (r *Response) MustString() string {
 }
 
 // MustDecode decodes the response body into the given interface, panicking if there's an error
-func (r *Response) MustDecode(v interface{}) {
+func (r *Response) MustDecode(v any) {
 	if err := r.Decode(v); err != nil {
 		panic(fmt.Sprintf("failed to decode response: %v", err))
 	}

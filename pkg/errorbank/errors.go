@@ -48,7 +48,7 @@ func (e *TemplateError) Unwrap() error {
 type ValidationError struct {
 	Field   string
 	Message string
-	Value   interface{}
+	Value   any
 }
 
 // Error returns the formatted error message
@@ -77,7 +77,7 @@ func NewTemplateError(variable, message string, cause error) *TemplateError {
 }
 
 // NewValidationError creates a new ValidationError
-func NewValidationError(field, message string, value interface{}) *ValidationError {
+func NewValidationError(field, message string, value any) *ValidationError {
 	return &ValidationError{
 		Field:   field,
 		Message: message,

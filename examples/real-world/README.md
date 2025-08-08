@@ -75,12 +75,14 @@ All examples use the template system for consistent AI interactions:
 ```go
 template := template.From(
     message.FromSystem("You are a helpful assistant."),
-    message.FromUser("{{user_input}}"),
+    message.FromUser("{{.UserInput}}"),
 )
 
-invokedTemplate := template.Invoke(map[string]any{
-    "user_input": "Hello, world!",
-})
+invokedTemplate := template.Invoke(struct {
+    UserInput string
+} {
+    UserInput: "Hello",
+}
 ```
 
 ### Error Handling
@@ -189,12 +191,15 @@ func processBatch(requests []Request) []Response {
 func (cg *ContentGenerator) GeneratePressRelease(ctx context.Context, company, announcement string) (string, error) {
     template := template.From(
         message.FromSystem("You are a PR specialist. Write professional press releases."),
-        message.FromUser("Write a press release for {{company}} announcing {{announcement}}."),
+        message.FromUser("Write a press release for {{.Company}} announcing {{.Announcement}}."),
     )
     
-    invokedTemplate := template.Invoke(map[string]any{
-        "company":     company,
-        "announcement": announcement,
+    invokedTemplate := template.Invoke(struct {
+        Company      string
+        Announcement string
+    } {
+        Company:      "Company",
+        Announcement: "Announcement",
     })
     
     response, err := cg.provider.Invoke(ctx, invokedTemplate)
